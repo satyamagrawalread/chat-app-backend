@@ -4,14 +4,15 @@
   "info": {
     "singularName": "session",
     "pluralName": "sessions",
-    "displayName": "Session"
+    "displayName": "Session",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "Name": {
+    "name": {
       "type": "string",
       "required": true,
       "maxLength": 55,
@@ -20,14 +21,15 @@
     "messages": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::message.message"
+      "target": "api::message.message",
+      "mappedBy": "session"
     },
     "lastMessage": {
       "type": "text",
       "maxLength": 55,
       "minLength": 3
     },
-    "user": {
+    "owner": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",

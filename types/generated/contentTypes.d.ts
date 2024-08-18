@@ -375,6 +375,21 @@ export interface ApiMessageMessage extends Schema.CollectionType {
   };
   attributes: {
     text: Attribute.String & Attribute.Required;
+    sender: Attribute.Relation<
+      'api::message.message',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    session: Attribute.Relation<
+      'api::message.message',
+      'manyToOne',
+      'api::session.session'
+    >;
+    receiver: Attribute.Relation<
+      'api::message.message',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -399,12 +414,13 @@ export interface ApiSessionSession extends Schema.CollectionType {
     singularName: 'session';
     pluralName: 'sessions';
     displayName: 'Session';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    Name: Attribute.String &
+    name: Attribute.String &
       Attribute.Required &
       Attribute.SetMinMaxLength<{
         minLength: 3;
@@ -420,7 +436,7 @@ export interface ApiSessionSession extends Schema.CollectionType {
         minLength: 3;
         maxLength: 55;
       }>;
-    user: Attribute.Relation<
+    owner: Attribute.Relation<
       'api::session.session',
       'manyToOne',
       'plugin::users-permissions.user'

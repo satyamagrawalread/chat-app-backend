@@ -1,5 +1,7 @@
 'use strict';
 
+const server = require("../config/server");
+
 module.exports = {
   /**
    * An asynchronous register function that runs before
@@ -16,7 +18,7 @@ module.exports = {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/*{ strapi }*/) {
+  bootstrap({ strapi }) {
     const { Server } = require("socket.io");
     var io = new Server(strapi.server.httpServer, {
       cors: { // cors setup
@@ -27,37 +29,37 @@ module.exports = {
       },
     });
     io.on("connection", function (socket) { //Listening for a connection from the frontend
-      socket.on("join", ({ username }) => { // Listening for a join connection
-        console.log("user connected");
-        console.log("username is ", username);
-        if (username) {
-          socket.join("group"); // Adding the user to the group
+      socket.on("join", ({ sessionId }) => { // Listening for a join connection
+        if (sessionId) {
+          socket.join(`session-${sessionId}`); // Adding the user to the group
           socket.emit("welcome", { // Sending a welcome message to the User
-            user: "bot",
-            text: `${username}, Welcome to the group chat`,
-            userData: username,
+            user: "Server",
+            text: `Welcome to the chat`,
           });
         } else {
-          console.log("An error occurred");
+          socket.emit("error", {
+            message: "Session ID invalid"
+          })
         }
       });
-      socket.on("sendMessage", async (data) => { // Listening for a sendMessage connection
-        let strapiData = { // Generating the message data to be stored in Strapi
-          data: {
-            user: data.user,
-            message: data.message,
-          },
+      socket.on("clientMessage", async ({userId, message, sessionId}) => { // Listening for a sendMessage connection
+        let strapiData = {
+              text: message,
+              session: sessionId,
         };
-        var axios = require("axios");
-        await axios
-          .post("http://localhost:1337/api/messages", strapiData)//Storing the messages in Strapi
-          .then((e) => {
-            socket.broadcast.to("group").emit("message", {//Sending the message to the group
-              user: data.username,
-              text: data.message,
-            });
-          })
-          .catch((e) => console.log("error", e.message));
+        const clientMessage = await strapi.service("api::message.message").create({
+          data: {...strapiData, sender: userId, receiver: 3}
+        });
+        const serverMessage = await strapi.service("api::message.message").create({
+          data: {...strapiData, sender: 3, receiver: userId}
+        });
+        socket.emit('serverMessage', {
+          id: serverMessage.id,
+          message: serverMessage.text,
+          userId: 3,
+          name: 'Server',
+          createdAt: serverMessage.createdAt
+        })
       });
     });
   }

@@ -69,7 +69,7 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::session.session",
-      "mappedBy": "user"
+      "mappedBy": "owner"
     }
   }
 }
