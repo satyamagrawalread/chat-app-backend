@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const server = require("../config/server");
 
@@ -21,46 +21,55 @@ module.exports = {
   bootstrap({ strapi }) {
     const { Server } = require("socket.io");
     var io = new Server(strapi.server.httpServer, {
-      cors: { // cors setup
+      cors: {
+        // cors setup
         origin: "http://localhost:5173",
         methods: ["GET", "POST"],
         allowedHeaders: ["my-custom-header"],
         credentials: true,
       },
     });
-    io.on("connection", function (socket) { //Listening for a connection from the frontend
-      socket.on("join", ({ sessionId }) => { // Listening for a join connection
+    io.on("connection", function (socket) {
+      //Listening for a connection from the frontend
+      socket.on("join", ({ sessionId }) => {
+        // Listening for a join connection
         if (sessionId) {
           socket.join(`session-${sessionId}`); // Adding the user to the group
-          socket.emit("welcome", { // Sending a welcome message to the User
+          socket.emit("welcome", {
+            // Sending a welcome message to the User
             user: "Server",
             text: `Welcome to the chat`,
           });
         } else {
           socket.emit("error", {
-            message: "Session ID invalid"
-          })
+            message: "Session ID invalid",
+          });
         }
       });
-      socket.on("clientMessage", async ({userId, message, sessionId}) => { // Listening for a sendMessage connection
+      socket.on("clientMessage", async ({ userId, message, sessionId }) => {
+        // Listening for a sendMessage connection
         let strapiData = {
-              text: message,
-              session: sessionId,
+          text: message,
+          session: sessionId,
         };
-        const clientMessage = await strapi.service("api::message.message").create({
-          data: {...strapiData, sender: userId, receiver: 3}
-        });
-        const serverMessage = await strapi.service("api::message.message").create({
-          data: {...strapiData, sender: 3, receiver: userId}
-        });
-        socket.emit('serverMessage', {
+        const clientMessage = await strapi
+          .service("api::message.message")
+          .create({
+            data: { ...strapiData, sender: userId, receiver: 3 },
+          });
+        const serverMessage = await strapi
+          .service("api::message.message")
+          .create({
+            data: { ...strapiData, sender: 3, receiver: userId },
+          });
+        socket.emit("serverMessage", {
           id: serverMessage.id,
           message: serverMessage.text,
           userId: 3,
-          name: 'Server',
-          createdAt: serverMessage.createdAt
-        })
+          name: "Server",
+          createdAt: serverMessage.createdAt,
+        });
       });
     });
-  }
+  },
 };
