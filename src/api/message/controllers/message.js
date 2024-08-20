@@ -36,7 +36,7 @@ module.exports = createCoreController("api::message.message", ({ strapi }) => ({
       data: {
         text: message,
         sender: userId,
-        receiver: 2,
+        receiver: Number(process.env.SERVER_ID) || null,
         session: sessionId,
       },
     });

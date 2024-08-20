@@ -32,7 +32,7 @@ module.exports = {
     io.use(async (socket, next) => {
       try {
         //Socket Authentication
-        console.log(socket.handshake.query.token)
+        // console.log(socket.handshake.query.token)
         let result = await await strapi.service('plugin::users-permissions.jwt').verify(socket.handshake.query.token)
             //Save the User ID to the socket connection
             // socket.user = result.id;
@@ -66,17 +66,17 @@ module.exports = {
         const clientMessage = await strapi
           .service("api::message.message")
           .create({
-            data: { ...strapiData, sender: userId, receiver: 2 },
+            data: { ...strapiData, sender: userId, receiver: Number(process.env.SERVER_ID) || null },
           });
         const serverMessage = await strapi
           .service("api::message.message")
           .create({
-            data: { ...strapiData, sender: 2, receiver: userId },
+            data: { ...strapiData, sender: Number(process.env.SERVER_ID) || null, receiver: userId },
           });
         socket.emit("serverMessage", {
           id: serverMessage.id,
           message: serverMessage.text,
-          userId: 2,
+          userId: Number(process.env.SERVER_ID) || null,
           name: "Server",
           createdAt: serverMessage.createdAt,
         });
