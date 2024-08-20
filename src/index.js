@@ -29,7 +29,18 @@ module.exports = {
         credentials: true,
       },
     });
-    io.on("connection", function (socket) {
+    io.use(async (socket, next) => {
+      try {
+        //Socket Authentication
+        console.log(socket.handshake.query.token)
+        let result = await await strapi.service('plugin::users-permissions.jwt').verify(socket.handshake.query.token)
+            //Save the User ID to the socket connection
+            // socket.user = result.id;
+            next();
+          } catch (error) {
+            console.log(error)
+          }
+    }).on("connection", function (socket) {
       //Listening for a connection from the frontend
       socket.on("join", ({ sessionId }) => {
         // Listening for a join connection
@@ -55,17 +66,17 @@ module.exports = {
         const clientMessage = await strapi
           .service("api::message.message")
           .create({
-            data: { ...strapiData, sender: userId, receiver: 3 },
+            data: { ...strapiData, sender: userId, receiver: 2 },
           });
         const serverMessage = await strapi
           .service("api::message.message")
           .create({
-            data: { ...strapiData, sender: 3, receiver: userId },
+            data: { ...strapiData, sender: 2, receiver: userId },
           });
         socket.emit("serverMessage", {
           id: serverMessage.id,
           message: serverMessage.text,
-          userId: 3,
+          userId: 2,
           name: "Server",
           createdAt: serverMessage.createdAt,
         });
