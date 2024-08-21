@@ -4,11 +4,6 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
-  name: "strapi::cors",
-  config: {
-    headers: '*',
-    origin: '*',
-  },
   webhooks: {
     populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
   },
