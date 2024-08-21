@@ -38,7 +38,7 @@ module.exports = {
             // socket.user = result.id;
             next();
           } catch (error) {
-            console.log(error)
+            console.error(error)
           }
     }).on("connection", function (socket) {
       //Listening for a connection from the frontend
