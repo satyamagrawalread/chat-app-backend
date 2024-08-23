@@ -33,7 +33,7 @@ module.exports = {
       try {
         //Socket Authentication
         // console.log(socket.handshake.query.token)
-        let result = await await strapi.service('plugin::users-permissions.jwt').verify(socket.handshake.query.token)
+        let result = await strapi.service('plugin::users-permissions.jwt').verify(socket.handshake.query.token)
             //Save the User ID to the socket connection
             // socket.user = result.id;
             next();
@@ -72,6 +72,11 @@ module.exports = {
           .service("api::message.message")
           .create({
             data: { ...strapiData, sender: Number(process.env.SERVER_ID) || null, receiver: userId },
+          });
+          await strapi.service("api::session.session").update(sessionId, {
+            data: {
+              lastMessage: message,
+            },
           });
         socket.emit("serverMessage", {
           id: serverMessage.id,

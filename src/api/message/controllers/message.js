@@ -10,6 +10,7 @@ module.exports = createCoreController("api::message.message", ({ strapi }) => ({
   async create(ctx) {
     const userId = ctx.state.user.id;
     const message = ctx.request.body["text"] || "";
+    console.log('my Message: ', message);
     const sessionId = ctx.request.body["session"];
     if (!message) {
       return ctx.badRequest("Message is required");
