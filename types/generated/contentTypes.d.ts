@@ -431,11 +431,7 @@ export interface ApiSessionSession extends Schema.CollectionType {
       'oneToMany',
       'api::message.message'
     >;
-    lastMessage: Attribute.Text &
-      Attribute.SetMinMaxLength<{
-        minLength: 3;
-        maxLength: 55;
-      }>;
+    lastMessage: Attribute.Text;
     owner: Attribute.Relation<
       'api::session.session',
       'manyToOne',

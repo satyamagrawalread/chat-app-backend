@@ -25,9 +25,7 @@
       "mappedBy": "session"
     },
     "lastMessage": {
-      "type": "text",
-      "maxLength": 55,
-      "minLength": 3
+      "type": "text"
     },
     "owner": {
       "type": "relation",
